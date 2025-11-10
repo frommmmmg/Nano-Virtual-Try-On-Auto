@@ -191,15 +191,24 @@ const VirtualTryOnAutoUploader: React.FC<VirtualTryOnAutoUploaderProps> = ({ onA
   const [importStatus, setImportStatus] = useState<{type: 'success' | 'error', message: string} | null>(null);
 
   const [selectedStyles, setSelectedStyles] = useState<Record<string, boolean>>({
-      tShow: false, street: false, party: false, vintageBuilding: false, custom: false
+    tShow: true, street: true, party: true, vintageBuilding: true, custom: false
   });
   const [customLocation, setCustomLocation] = useState('');
+
+  // 默认步骤提示词（步骤1-3可编辑）
+  const defaultStepPrompts: Record<1|2|3, string> = {
+    1: "Replace the clothing of the character in image 1 with the apparel from image 2. Simultaneously, adjust the character's pose in image 1 to a more fitting and fashionable stance that best showcases the new garment, ensuring overall visual harmony and unity. The final output should embody a high-fashion editorial aesthetic.",
+    2: "A stunning fashion model from the first image expertly showcasing the handbag from the second image, embodying high fashion and modern elegance. The item should be prominently displayed in a way that compliments the model's pose and style.",
+    3: "Integrate the shoes from the second image onto the model from the first image. The shoes should be worn naturally, matching the model's pose and the overall high-fashion aesthetic of the image." 
+  };
+  const [stepPrompts, setStepPrompts] = useState<Record<1|2|3, string>>({ 1: defaultStepPrompts[1], 2: defaultStepPrompts[2], 3: defaultStepPrompts[3] });
+  const restoreStepPrompt = (step: 1|2|3) => setStepPrompts(prev => ({ ...prev, [step]: defaultStepPrompts[step] }));
 
   const stylesConfig = [
     { key: 'tShow', labelKey: 'transformations.effects.virtualTryOnAuto.tShow', prompt: "Reimagine the photo as a Fashion editorial cover shoot. Create an ultra-realistic portrait with impeccable detail in the skin texture and fabric. in T-show, The subject should hold a powerful, dramatic pose. Illuminate the scene with moody, cinematic lighting that sculpts the features and casts deep, artistic shadows, creating a high-fashion, atmospheric feel." },
     { key: 'street', labelKey: 'transformations.effects.virtualTryOnAuto.street', prompt: "Reimagine the photo as a Fashion editorial cover shoot. Create an ultra-realistic portrait with impeccable detail in the skin texture and fabric. In the Street, the subject should hold a powerful, dramatic pose. Illuminate the scene with moody, cinematic lighting that sculpts the features and casts deep, artistic shadows, creating a high-fashion, atmospheric feel." },
-    { key: 'party', labelKey: 'transformations.effects.virtualTryOnAuto.party', prompt: "Capture the essence of a high-fashion editorial cover: An ultra-realistic portrait demanding impeccable fidelity in skin texture and fabric detail. Against the opulent backdrop of an **exclusive, candlelit grand ballroom/lounge**, the subject strikes a dynamic, commanding pose. The scene must be dramatically sculpted by moody, cinematic illumination, emphasizing deep, artistic shadows and chiseled features, forging an atmosphere of **intimate, sophisticated glamour perfect for a spectacular indoor Ball and Party event.**" },
-    { key: 'vintageBuilding', labelKey: 'transformations.effects.virtualTryOnAuto.vintageBuilding', prompt: "Capture the essence of a high-fashion editorial cover: An ultra-realistic portrait demanding impeccable fidelity in skin texture and fabric detail. Against the backdrop of a grand vintage edifice, the subject strikes a dynamic, commanding pose. The scene must be dramatically sculpted by moody, cinematic illumination, emphasizing deep, artistic shadows and chiseled features, forging an atmosphere of opulent glamour perfect for a spectacular Ball and Party night." },
+    { key: 'party', labelKey: 'transformations.effects.virtualTryOnAuto.party', prompt: "Reimagine the photo as a Fashion editorial cover shoot. Create an ultra-realistic portrait with impeccable detail in the skin texture and fabric. In an exclusive, candlelit grand ballroom/lounge, the subject should hold a powerful, dramatic pose. Illuminate the scene with moody, cinematic lighting that sculpts the features and casts deep, artistic shadows, creating a high-fashion, atmospheric feel." },
+    { key: 'vintageBuilding', labelKey: 'transformations.effects.virtualTryOnAuto.vintageBuilding', prompt: "Capture the essence of a high-fashion editorial cover: An ultra-realistic portrait demanding impeccable fidelity in skin texture and fabric detail. Against the backdrop of a grand vintage edifice, the subject strikes a dynamic, commanding pose. The scene must be dramatically sculpted by moody, cinematic illumination, emphasizing deep, artistic shadows and chiseled features" },
     { key: 'custom', labelKey: 'transformations.effects.virtualTryOnAuto.customize', prompt: "Capture the essence of a high-fashion editorial cover: An ultra-realistic portrait demanding impeccable fidelity in skin texture and fabric detail. Against the backdrop of **[LOCATION]**, the subject strikes a dynamic, commanding pose. The scene must be dramatically sculpted by moody, cinematic illumination, emphasizing deep, artistic shadows and chiseled features, forging an atmosphere of opulent glamour perfect for a spectacular Ball and Party night." },
   ];
   
@@ -258,7 +267,7 @@ const VirtualTryOnAutoUploader: React.FC<VirtualTryOnAutoUploaderProps> = ({ onA
         setErrors(prev => ({ ...prev, step1: t('app.error.uploadBoth') }));
         return;
       }
-      const prompt = "Replace the clothing of the character in image 1 with the apparel from image 2. Simultaneously, adjust the character's pose in image 1 to a more fitting and fashionable stance that best showcases the new garment, ensuring overall visual harmony and unity. The final output should embody a high-fashion editorial aesthetic.";
+      const prompt = (stepPrompts[1]?.trim()) || defaultStepPrompts[1];
       const filename = `step1_try_on_${images.clothing.name}`;
       const result = await generateStep(1, modelInput, images.clothing, prompt, filename);
       if (result) setStep1Result(result);
@@ -269,7 +278,7 @@ const VirtualTryOnAutoUploader: React.FC<VirtualTryOnAutoUploaderProps> = ({ onA
         setErrors(prev => ({ ...prev, step2: 'Please upload a bag image.' }));
         return;
       }
-      const prompt = "A stunning fashion model from the first image expertly showcasing the handbag from the second image, embodying high fashion and modern elegance. The item should be prominently displayed in a way that compliments the model's pose and style.";
+      const prompt = (stepPrompts[2]?.trim()) || defaultStepPrompts[2];
       const filename = `step2_add_bag_${images.bag.name}`;
       const result = await generateStep(2, inputImage, images.bag, prompt, filename);
       if (result) setStep2Result(result);
@@ -280,7 +289,7 @@ const VirtualTryOnAutoUploader: React.FC<VirtualTryOnAutoUploaderProps> = ({ onA
         setErrors(prev => ({ ...prev, step3: 'Please upload a shoes image.' }));
         return;
       }
-      const prompt = "Integrate the shoes from the second image onto the model from the first image. The shoes should be worn naturally, matching the model's pose and the overall high-fashion aesthetic of the image.";
+      const prompt = (stepPrompts[3]?.trim()) || defaultStepPrompts[3];
       const filename = `step3_add_shoes_${images.shoes.name}`;
       const result = await generateStep(3, inputImage, images.shoes, prompt, filename);
       if (result) setStep3Result(result);
@@ -487,6 +496,7 @@ const VirtualTryOnAutoUploader: React.FC<VirtualTryOnAutoUploaderProps> = ({ onA
   const handleClearAll = () => {
       setData(JSON.parse(JSON.stringify(defaultState)));
       setImages({ model: null, clothing: null, bag: null, shoes: null });
+    setStepModelInputs({ step1: null, step2: null, step3: null, step4: null });
       setStep1Result(null); setStep2Result(null); setStep3Result(null); setStep4Results([]);
       setErrors({});
   };
@@ -551,7 +561,23 @@ const VirtualTryOnAutoUploader: React.FC<VirtualTryOnAutoUploaderProps> = ({ onA
   return (
     <div className="flex flex-col gap-6 p-6 bg-[var(--bg-card-alpha)] backdrop-blur-lg rounded-xl border border-[var(--border-primary)] shadow-2xl shadow-black/20">
       {/* Step 1 */}
-      {renderStep(1, "transformations.effects.virtualTryOnAuto.step1", "transformations.effects.virtualTryOnAuto.model", "transformations.effects.virtualTryOnAuto.clothing", "model", "clothing", step1Result, handleGenerateStep1, () => useResultAsStepModelInput(step1Result, 2), stepModelInputs.step1?.dataUrl ?? images.model?.dataUrl ?? null, (f,d) => handleStepModelChange(1, f, d), () => handleClearStepModel(1))}
+      {renderStep(1, "transformations.effects.virtualTryOnAuto.step1", "transformations.effects.virtualTryOnAuto.model", "transformations.effects.virtualTryOnAuto.clothing", "model", "clothing", step1Result, handleGenerateStep1, () => useResultAsStepModelInput(step1Result, 2), stepModelInputs.step1?.dataUrl ?? images.model?.dataUrl ?? null, (f,d) => handleStepModelChange(1, f, d), () => handleClearStepModel(1), (
+        <div className="mt-3 flex flex-col gap-2">
+          <label htmlFor="step1PromptTextarea" className="text-xs font-semibold text-[var(--text-secondary)]">Step 1 Prompt</label>
+          <textarea
+            id="step1PromptTextarea"
+            title="Step 1 Prompt"
+            placeholder="输入或编辑第1步的提示词..."
+            value={stepPrompts[1]}
+            onChange={e => setStepPrompts(p => ({...p, 1: e.target.value}))}
+            rows={4}
+            className="w-full text-xs p-2 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-md focus:ring-1 focus:ring-[var(--accent-primary)]"
+          />
+          <div className="flex justify-end">
+            <button type="button" onClick={() => restoreStepPrompt(1)} className="px-2 py-1 text-xs bg-[rgba(107,114,128,0.2)] hover:bg-[rgba(107,114,128,0.4)] rounded-md">恢复默认</button>
+          </div>
+        </div>
+      ))}
       <StepSeparator/>
       {/* Step 2 */}
       {renderStep(2, "transformations.effects.virtualTryOnAuto.step2", "transformations.effects.virtualTryOnAuto.model", "transformations.effects.virtualTryOnAuto.bag", "model", "bag", step2Result, async () => {
@@ -566,7 +592,23 @@ const VirtualTryOnAutoUploader: React.FC<VirtualTryOnAutoUploaderProps> = ({ onA
           } else {
             setErrors(prev => ({ ...prev, step2: t('app.error.uploadBoth') }));
           }
-        }, () => useResultAsStepModelInput(step2Result, 3), stepModelInputs.step2?.dataUrl ?? step1Result?.imageUrl ?? images.model?.dataUrl ?? null, (f,d) => handleStepModelChange(2, f, d), () => handleClearStepModel(2))}
+        }, () => useResultAsStepModelInput(step2Result, 3), stepModelInputs.step2?.dataUrl ?? step1Result?.imageUrl ?? images.model?.dataUrl ?? null, (f,d) => handleStepModelChange(2, f, d), () => handleClearStepModel(2), (
+          <div className="mt-3 flex flex-col gap-2">
+            <label htmlFor="step2PromptTextarea" className="text-xs font-semibold text-[var(--text-secondary)]">Step 2 Prompt</label>
+            <textarea
+              id="step2PromptTextarea"
+              title="Step 2 Prompt"
+              placeholder="输入或编辑第2步的提示词..."
+              value={stepPrompts[2]}
+              onChange={e => setStepPrompts(p => ({...p, 2: e.target.value}))}
+              rows={4}
+              className="w-full text-xs p-2 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-md focus:ring-1 focus:ring-[var(--accent-primary)]"
+            />
+            <div className="flex justify-end">
+              <button type="button" onClick={() => restoreStepPrompt(2)} className="px-2 py-1 text-xs bg-[rgba(107,114,128,0.2)] hover:bg-[rgba(107,114,128,0.4)] rounded-md">恢复默认</button>
+            </div>
+          </div>
+        ))}
       <StepSeparator/>
       {/* Step 3 */}
       {renderStep(3, "transformations.effects.virtualTryOnAuto.step3", "transformations.effects.virtualTryOnAuto.model", "transformations.effects.virtualTryOnAuto.shoes", "model", "shoes", step3Result, async () => {
@@ -580,7 +622,23 @@ const VirtualTryOnAutoUploader: React.FC<VirtualTryOnAutoUploaderProps> = ({ onA
           } else {
             setErrors(prev => ({ ...prev, step3: t('app.error.uploadBoth') }));
           }
-        }, () => useResultAsStepModelInput(step3Result, 4), stepModelInputs.step3?.dataUrl ?? step2Result?.imageUrl ?? images.model?.dataUrl ?? null, (f,d) => handleStepModelChange(3, f, d), () => handleClearStepModel(3))}
+        }, () => useResultAsStepModelInput(step3Result, 4), stepModelInputs.step3?.dataUrl ?? step2Result?.imageUrl ?? images.model?.dataUrl ?? null, (f,d) => handleStepModelChange(3, f, d), () => handleClearStepModel(3), (
+          <div className="mt-3 flex flex-col gap-2">
+            <label htmlFor="step3PromptTextarea" className="text-xs font-semibold text-[var(--text-secondary)]">Step 3 Prompt</label>
+            <textarea
+              id="step3PromptTextarea"
+              title="Step 3 Prompt"
+              placeholder="输入或编辑第3步的提示词..."
+              value={stepPrompts[3]}
+              onChange={e => setStepPrompts(p => ({...p, 3: e.target.value}))}
+              rows={4}
+              className="w-full text-xs p-2 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-md focus:ring-1 focus:ring-[var(--accent-primary)]"
+            />
+            <div className="flex justify-end">
+              <button type="button" onClick={() => restoreStepPrompt(3)} className="px-2 py-1 text-xs bg-[rgba(107,114,128,0.2)] hover:bg-[rgba(107,114,128,0.4)] rounded-md">恢复默认</button>
+            </div>
+          </div>
+        ))}
       <StepSeparator/>
       
       {/* Step 4 */}
