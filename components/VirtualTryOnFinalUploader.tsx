@@ -199,7 +199,7 @@ const VirtualTryOnAutoUploader: React.FC<VirtualTryOnAutoUploaderProps> = ({ onA
   const defaultStepPrompts: Record<1|2|3, string> = {
     1: "Replace the clothing of the character in image 1 with the apparel from image 2. Simultaneously, adjust the character's pose in image 1 to a more fitting and fashionable stance that best showcases the new garment, ensuring overall visual harmony and unity. The final output should embody a high-fashion editorial aesthetic.",
     2: "A stunning fashion model from the first image expertly showcasing the handbag from the second image, embodying high fashion and modern elegance. The model should hold or wear the item with an effortless, organic pose that seamlessly integrates the handbag into the model's overall flow and style.",
-    3: "Integrate the shoes from the second image onto the model from the first image. The shoes should be worn naturally, matching the model's pose and the overall high-fashion aesthetic of the image." 
+    3: "Wear the shoes from the second image onto the model from the first image. The shoes should be worn naturally, matching the model's pose and the overall high-fashion aesthetic of the image." 
   };
   const [stepPrompts, setStepPrompts] = useState<Record<1|2|3, string>>({ 1: defaultStepPrompts[1], 2: defaultStepPrompts[2], 3: defaultStepPrompts[3] });
   const restoreStepPrompt = (step: 1|2|3) => setStepPrompts(prev => ({ ...prev, [step]: defaultStepPrompts[step] }));
