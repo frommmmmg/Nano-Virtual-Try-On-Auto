@@ -257,6 +257,7 @@ export default {
         street: "Street",
         party: "Party",
         vintageBuilding: "Vintage Building",
+        nightClub: "Night Club",
         automation: "Automation",
         automateSteps123: "Automate Steps 1-3",
         automateStep4: "Automate Step 4",

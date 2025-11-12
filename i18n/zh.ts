@@ -257,6 +257,7 @@ export default {
         street: "街拍",
         party: "派对",
         vintageBuilding: "复古建筑",
+        nightClub: "夜店派对",
         automation: "自动化",
         automateSteps123: "自动执行1-3步",
         automateStep4: "自动执行第4步",

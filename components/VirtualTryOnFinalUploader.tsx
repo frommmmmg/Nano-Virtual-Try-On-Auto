@@ -191,7 +191,7 @@ const VirtualTryOnAutoUploader: React.FC<VirtualTryOnAutoUploaderProps> = ({ onA
   const [importStatus, setImportStatus] = useState<{type: 'success' | 'error', message: string} | null>(null);
 
   const [selectedStyles, setSelectedStyles] = useState<Record<string, boolean>>({
-    tShow: true, street: true, party: true, vintageBuilding: true, custom: false
+    tShow: true, street: true, party: true, vintageBuilding: true, nightClub: true, custom: false
   });
   const [customLocation, setCustomLocation] = useState('');
 
@@ -209,6 +209,7 @@ const VirtualTryOnAutoUploader: React.FC<VirtualTryOnAutoUploaderProps> = ({ onA
     { key: 'street', labelKey: 'transformations.effects.virtualTryOnAuto.street', prompt: "Reimagine the photo as a Fashion editorial cover shoot. Create an ultra-realistic portrait with impeccable detail in the skin texture and fabric. In the Street, the subject should hold a powerful, dramatic pose. Illuminate the scene with moody, cinematic lighting that sculpts the features and casts deep, artistic shadows, creating a high-fashion, atmospheric feel." },
     { key: 'party', labelKey: 'transformations.effects.virtualTryOnAuto.party', prompt: "Reimagine the photo as a Fashion editorial cover shoot. Create an ultra-realistic portrait with impeccable detail in the skin texture and fabric. In an exclusive, candlelit grand ballroom/lounge, the subject should hold a powerful, dramatic pose. Illuminate the scene with moody, cinematic lighting that sculpts the features and casts deep, artistic shadows, creating a high-fashion, atmospheric feel." },
     { key: 'vintageBuilding', labelKey: 'transformations.effects.virtualTryOnAuto.vintageBuilding', prompt: "Capture the essence of a high-fashion editorial cover: An ultra-realistic portrait demanding impeccable fidelity in skin texture and fabric detail. Against the backdrop of a grand vintage edifice, the subject strikes a dynamic, commanding pose. The scene must be dramatically sculpted by moody, cinematic illumination, emphasizing deep, artistic shadows and chiseled features" },
+    { key: 'nightClub', labelKey: 'transformations.effects.virtualTryOnAuto.nightClub', prompt: "Reimagine the photo inside a high-energy night club. Create an ultra-realistic portrait with impeccable skin and fabric detail. The scene features a live DJ booth, pulsing neon lights, laser beams, and a lively dancing crowd. The subject strikes a dynamic, powerful pose. Illuminate the scene with moody, cinematic lighting and vibrant color gels, casting deep, artistic shadows for a high-fashion, electric atmosphere." },
     { key: 'custom', labelKey: 'transformations.effects.virtualTryOnAuto.customize', prompt: "Capture the essence of a high-fashion editorial cover: An ultra-realistic portrait demanding impeccable fidelity in skin texture and fabric detail. Against the backdrop of **[LOCATION]**, the subject strikes a dynamic, commanding pose. The scene must be dramatically sculpted by moody, cinematic illumination, emphasizing deep, artistic shadows and chiseled features, forging an atmosphere of opulent glamour perfect for a spectacular Ball and Party night." },
   ];
   
